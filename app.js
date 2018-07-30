@@ -12,22 +12,17 @@ const templating = require('./middleware/templating');
 
 const index = require('./routes/index');
 const users = require('./routes/users');
-const lookbook = require('./routes/lookbook');
-const campaign = require('./routes/campaign');
-const cooperation = require('./routes/cooperation');
-const branding = require('./routes/branding');
-const designer = require('./routes/designer');
 const news = require('./routes/news');
 const product = require('./routes/product');
 const artist = require('./routes/artist');
 const indexImg = require('./routes/indexImg');
+const indexProduct = require('./routes/indexProduct');
 const tag = require('./routes/tag');
 const worker = require('./routes/worker');
 const contact = require('./routes/contact');
 const config_api = require('./routes/config');
-const show = require('./routes/show');
-const redis = require('./routes/redis');
 const message = require('./routes/message');
+const redis = require('./routes/redis');
 
 const checkAuthority = require('./middleware/authority');
 
@@ -71,7 +66,6 @@ app.use(async (ctx, next) => {
 // cors
 app.use(cors({
   origin: config.FRONTEND_URL,
-  // origin: '*',
   exposeHeaders: ['WWW-Authenticate', 'Server-Authorization', 'Date'],
   maxAge: 100,
   credentials: true,
@@ -86,18 +80,13 @@ app.use(checkAuthority());
 // routes
 app.use(index.routes(), index.allowedMethods());
 app.use(users.routes(), users.allowedMethods());
-app.use(lookbook.routes(), lookbook.allowedMethods());
-app.use(campaign.routes(), campaign.allowedMethods());
-app.use(cooperation.routes(), cooperation.allowedMethods());
-app.use(branding.routes(), branding.allowedMethods());
-app.use(designer.routes(), designer.allowedMethods());
 app.use(news.routes(), news.allowedMethods());
 app.use(product.routes(), product.allowedMethods());
 app.use(artist.routes(), artist.allowedMethods());
 app.use(indexImg.routes(), indexImg.allowedMethods());
+app.use(indexProduct.routes(), indexProduct.allowedMethods());
 app.use(tag.routes(), tag.allowedMethods());
 app.use(worker.routes(), worker.allowedMethods());
-app.use(show.routes(), show.allowedMethods());
 app.use(contact.routes(), contact.allowedMethods());
 app.use(config_api.routes(), config_api.allowedMethods());
 app.use(message.routes(), message.allowedMethods());

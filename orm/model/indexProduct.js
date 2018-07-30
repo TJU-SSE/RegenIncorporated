@@ -1,18 +1,16 @@
 const Sequlize = require('sequelize');
 const sequlize = require('../sequelize');
 
-let Lookbook = sequlize.define('lookbook', {
+let IndexProduct = sequlize.define('index_product', {
     id: {
         type: Sequlize.BIGINT,
         primaryKey: true,
         autoIncrement: true
     },
-    title: Sequlize.STRING(100),
-    releaseTime: Sequlize.BIGINT,
-    description: Sequlize.STRING(10000),
+    rank: Sequlize.DOUBLE
 }, {
     freezeTableName: true,
     timestamps: true,
 });
 
-module.exports = Lookbook;
+module.exports = IndexProduct;

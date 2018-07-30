@@ -34,8 +34,13 @@ pub.findOrCreate = async (title) => {
 pub.deleteOne = async (tag) => {
     let newsTags = await tag.getNewsTags();
     for (let x in newsTags) {
-        let newsTags = newsTags[x];
-        await newsTags.destroy();
+        let newsTag = newsTags[x];
+        await newsTag.destroy();
+    }
+    let productTags = await tag.getProductTags();
+    for (let x in productTags) {
+        let productTag = productTags[x];
+        await productTag.destroy();
     }
     await tag.destroy();
 };

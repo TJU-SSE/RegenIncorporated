@@ -79,12 +79,13 @@ pub.createIndexImgsViewModel = async (indexImgs) => {
             let indexImg = indexImgs[x];
             let id = indexImg.get('id');
             let news = await indexImg.getNews();
+            let news_title = news.get('title');
             let news_id = news.get('id');
             let img = await news.getCoverImg();
             let img_id = img.get('id');
             let img_url = img.get('url');
             let rank = indexImg.get('rank');
-            ret.push(IndexImgViewModel.createIndexImgsViewModel(id, news_id, img_id, img_url, rank));
+            ret.push(IndexImgViewModel.createIndexImgsViewModel(id, news_id, img_id, img_url, rank, news_title));
         }
         return ret.sort((a, b) => {
             return a.rank - b.rank;

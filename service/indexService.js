@@ -1,3 +1,7 @@
+const ArtistRepository = require('../orm/repository/artistRepository');
+const ArtistProductRepository = require('../orm/repository/artistProductRepository');
+const ProductRepository = require('../orm/repository/productRepository');
+const ArtistViewModel = require('../view_model/artist');
 const Qiniu = require('../utils/qiniu');
 
 let pub = {};

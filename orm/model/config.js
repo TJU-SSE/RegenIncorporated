@@ -6,7 +6,7 @@ let Config = sequlize.define('config', {
         type: Sequlize.STRING(256),
         primaryKey: true
     },
-    content: Sequlize.STRING(2048),
+    content: Sequlize.STRING(256),
 }, {
     freezeTableName: true,
     timestamps: true,

@@ -1,7 +1,7 @@
 const Sequlize = require('sequelize');
 const sequlize = require('../sequelize');
 
-let PortfolioImg = sequlize.define('portfolio_img', {
+let Achievement = sequlize.define('achievement', {
     id: {
         type: Sequlize.BIGINT,
         primaryKey: true,
@@ -13,4 +13,4 @@ let PortfolioImg = sequlize.define('portfolio_img', {
     timestamps: true,
 });
 
-module.exports = PortfolioImg;
+module.exports = Achievement;

@@ -16,20 +16,21 @@ pub.createArtist = function (id, name, identity, social, address, extraBiography
     };
 };
 
-pub.createArtistBrief = function (id, name, identity, img_id, img_url) {
+pub.createArtistBrief = function (id, name, identity, img_id, img_url, role) {
     console.log(id, name, identity, img_id, img_url);
     return {
         id: id,
         name: name,
         identity: identity,
         img_id: img_id,
-        img_url: img_url
+        img_url: img_url,
+        role
     };
 };
 
-pub.createArtistProducts = function (artistProductId, rank, productId, title, session, releaseTime, introduction, img_id, img_url) {
+pub.createAchievements = function (achievementId, rank, productId, title, session, releaseTime, introduction, img_id, img_url) {
    return {
-       artistProductId: artistProductId,
+       achievementId: achievementId,
        rank: rank,
        productId: productId,
        title: title,
@@ -38,6 +39,20 @@ pub.createArtistProducts = function (artistProductId, rank, productId, title, se
        introduction:introduction,
        img_id: img_id,
        img_url: img_url
+    }
+};
+
+pub.createArtistProducts = function (artistProductId, rank, productId, title, session, releaseTime, introduction, img_id, img_url) {
+    return {
+        artistProductId: artistProductId,
+        rank: rank,
+        productId: productId,
+        title: title,
+        session: session,
+        releaseTime: releaseTime,
+        introduction:introduction,
+        img_id: img_id,
+        img_url: img_url
     }
 };
 

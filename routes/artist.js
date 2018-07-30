@@ -22,16 +22,33 @@ router.get('/selectByName/:name', async (ctx, next) => {
 });
 
 // OK
+router.get('/selectById/:id', async (ctx, next) => {
+  try {
+    let id = ctx.params.id;
+    if (!id) { ctx.response.body = ResponseService.createErrResponse('Name not found'); return; }
+    let artist = await ArtistService.findOne({id: id});
+    if (!artist) { ctx.response.body = ResponseService.createErrResponse('Artist not found'); return; }
+    let ret = await ArtistService.createArtistViewModel(artist);
+    ctx.response.body = ResponseService.createJSONResponse(ret);
+  } catch (e) {
+    ctx.response.body = ResponseService.createErrResponse(e);
+  }
+});
+
+// OK
 router.get('/selectByIdentity/:identity', async (ctx, next) => {
     try {
         let identity = ctx.params.identity;
         if (!identity) { ctx.response.body = ResponseService.createErrResponse('Identity not found'); return; }
-        let artists = await ArtistService.findAllFilter({identity: identity});
-        if (!artists) { ctx.response.body = ResponseService.createErrResponse('Artists not found'); return; }
-        console.log(ctx.query);
         let pageOffset = ctx.query.pageOffset || 0;
-        let itemSize = ctx.query.itemSize || 0;
-        let ret = await ArtistService.createArtistsViewModel(artists, pageOffset, itemSize);
+        let itemSize = ctx.query.itemSize || 20;
+        let total = await ArtistService.getTotalSize(identity);
+        itemSize = parseInt(itemSize);
+        pageOffset = parseInt(pageOffset) * parseInt(itemSize);
+        let artists = await ArtistService.findAllFilter({'where': {identity: identity}, 'limit': itemSize, 'offset': pageOffset});
+        if (!artists) { ctx.response.body = ResponseService.createErrResponse('Artists not found'); return; }
+        console.log('artists...', artists)
+        let ret = await ArtistService.createArtistsViewModel(artists, pageOffset, itemSize, total);
         ctx.response.body = ResponseService.createJSONResponse(ret);
     } catch (e) {
         ctx.response.body = ResponseService.createErrResponse(e);
@@ -73,16 +90,16 @@ router.post('/create', async (ctx, next) => {
 // OK
 router.post('/update', async (ctx, next) => {
     try {
-        let id = ctx.request.body.fields.id;
+        let id = ctx.request.body.id;
         if (!id) { ctx.response.body = ResponseService.createErrResponse('Id not found'); return; }
         let artist = await ArtistService.findOne({id: id});
         if (!artist) { ctx.response.body = ResponseService.createErrResponse('Artist not found'); return; }
-        let name = ctx.request.body.fields.name || '';
-        let identity = ctx.request.body.fields.identity || '';
-        let social = ctx.request.body.fields.social || '';
-        let address = ctx.request.body.fields.address || '';
-        let extraBiography = ctx.request.body.fields.extraBiography || '';
-        let biography = ctx.request.body.fields.biography || '';
+        let name = ctx.request.body.name || '';
+        let identity = ctx.request.body.identity || '';
+        let social = ctx.request.body.social || '';
+        let address = ctx.request.body.address || '';
+        let extraBiography = ctx.request.body.extraBiography || '';
+        let biography = ctx.request.body.biography || '';
         let ret = await ArtistService.update(artist, name, identity, social, address, extraBiography, biography);
         ctx.response.body = ResponseService.createJSONResponse(ret);
     } catch(e) {
@@ -107,19 +124,41 @@ router.post('/updateImg',  async (ctx, next) => {
 });
 
 
+// OK
 router.post('/createArtistProduct',  async (ctx, next) => {
     try {
-        let artistName = ctx.request.body.fields.artistName;
-        if (!artistName) { ctx.response.body = ResponseService.createErrResponse('ArtistName not found'); return; }
-        let artist = await ArtistService.findOne({name: artistName});
+        let artistId = ctx.request.body.artistId;
+        if (!artistId) { ctx.response.body = ResponseService.createErrResponse('ArtistId not found'); return; }
+        let artist = await ArtistService.findOne({id: artistId});
         if (!artist) { ctx.response.body = ResponseService.createErrResponse('Artist not found'); return; }
-        let productId = ctx.request.body.fields.productId;
+        let productId = ctx.request.body.productId;
         if (!productId) { ctx.response.body = ResponseService.createErrResponse('ProductId not found'); return; }
         let product = await ProductService.findOne({id: productId});
         if (!product) { ctx.response.body = ResponseService.createErrResponse('Product not found'); return; }
-        let rank = ctx.request.body.fields.rank;
+        let rank = ctx.request.body.rank;
         if (!rank) { ctx.response.body = ResponseService.createErrResponse('Rank not found'); return; }
         let ret = await ArtistService.createArtistProduct(artist, product, rank);
+        ctx.response.body = ResponseService.createJSONResponse(ret);
+    } catch(e) {
+        ctx.response.body = ResponseService.createErrResponse(e);
+    }
+});
+
+
+// OK
+router.post('/createAchievement',  async (ctx, next) => {
+    try {
+        let artistId = ctx.request.body.artistId;
+        if (!artistId) { ctx.response.body = ResponseService.createErrResponse('ArtistId not found'); return; }
+        let artist = await ArtistService.findOne({id: artistId});
+        if (!artist) { ctx.response.body = ResponseService.createErrResponse('Artist not found'); return; }
+        let productId = ctx.request.body.productId;
+        if (!productId) { ctx.response.body = ResponseService.createErrResponse('ProductId not found'); return; }
+        let product = await ProductService.findOne({id: productId});
+        if (!product) { ctx.response.body = ResponseService.createErrResponse('Product not found'); return; }
+        let rank = ctx.request.body.rank;
+        if (!rank) { ctx.response.body = ResponseService.createErrResponse('Rank not found'); return; }
+        let ret = await ArtistService.createAchievement(artist, product, rank);
         ctx.response.body = ResponseService.createJSONResponse(ret);
     } catch(e) {
         ctx.response.body = ResponseService.createErrResponse(e);
@@ -135,7 +174,7 @@ router.get('/selectArticleProductByName/:name', async (ctx, next) => {
         let artist = await ArtistService.findOne({name: name});
         if (!artist) { ctx.response.body = ResponseService.createErrResponse('Artist not found'); return; }
         let pageOffset = ctx.query.pageOffset || 0;
-        let itemSize = ctx.query.itemSize || 0;
+        let itemSize = ctx.query.itemSize || 20;
         let ret = await ArtistService.createArtistProductsViewModel(artist, pageOffset, itemSize);
         ctx.response.body = ResponseService.createJSONResponse(ret);
     } catch (e) {
@@ -143,12 +182,64 @@ router.get('/selectArticleProductByName/:name', async (ctx, next) => {
     }
 });
 
+
+// OK
+router.get('/selectAchievementByName/:name', async (ctx, next) => {
+    try {
+        let name = ctx.params.name;
+        if (!name) { ctx.response.body = ResponseService.createErrResponse('Name not found'); return; }
+        let artist = await ArtistService.findOne({name: name});
+        if (!artist) { ctx.response.body = ResponseService.createErrResponse('Artist not found'); return; }
+        let pageOffset = ctx.query.pageOffset || 0;
+        let itemSize = ctx.query.itemSize || 20;
+        let ret = await ArtistService.createAchievementsViewModel(artist, pageOffset, itemSize);
+        ctx.response.body = ResponseService.createJSONResponse(ret);
+    } catch (e) {
+        ctx.response.body = ResponseService.createErrResponse(e);
+    }
+});
+
+
+// OK
+router.get('/selectArticleProductById/:id', async (ctx, next) => {
+  try {
+    let id = ctx.params.id;
+    if (!id) { ctx.response.body = ResponseService.createErrResponse('Id not found'); return; }
+    let artist = await ArtistService.findOne({id: id});
+    if (!artist) { ctx.response.body = ResponseService.createErrResponse('Artist not found'); return; }
+    let pageOffset = parseInt(ctx.query.pageOffset)  || 0;
+    let itemSize = parseInt(ctx.query.itemSize) || 20;
+    pageOffset *= itemSize;
+    let ret = await ArtistService.createArtistProductsViewModel(artist, pageOffset, itemSize);
+    ctx.response.body = ResponseService.createJSONResponse(ret);
+  } catch (e) {
+    ctx.response.body = ResponseService.createErrResponse(e);
+  }
+});
+
+
+router.get('/selectAchievementById/:id', async (ctx, next) => {
+  try {
+    let id = ctx.params.id;
+    if (!id) { ctx.response.body = ResponseService.createErrResponse('Id not found'); return; }
+    let artist = await ArtistService.findOne({id: id});
+    if (!artist) { ctx.response.body = ResponseService.createErrResponse('Artist not found'); return; }
+    let pageOffset = parseInt(ctx.query.pageOffset)  || 0;
+    let itemSize = parseInt(ctx.query.itemSize) || 20;
+    pageOffset *= itemSize;
+    let ret = await ArtistService.createAchievementsViewModel(artist, pageOffset, itemSize);
+    ctx.response.body = ResponseService.createJSONResponse(ret);
+  } catch (e) {
+    ctx.response.body = ResponseService.createErrResponse(e);
+  }
+});
+
 // OK
 router.post('/updateRanks', async (ctx, next) => {
     try {
-        let name = ctx.request.body.artistName;
-        if (!name) { ctx.response.body = ResponseService.createErrResponse('ArtistName not found'); return; }
-        let artist = await ArtistService.findOne({name: name});
+        let artistId = ctx.request.body.artistId;
+        if (!artistId) { ctx.response.body = ResponseService.createErrResponse('ArtistId not found'); return; }
+        let artist = await ArtistService.findOne({id: artistId});
         if (!artist) { ctx.response.body = ResponseService.createErrResponse('Artist not found'); return; }
         let products = ctx.request.body.products;
         let ret = await ArtistService.updateRanks(artist, products);
@@ -159,18 +250,49 @@ router.post('/updateRanks', async (ctx, next) => {
 });
 
 // OK
+router.post('/updateAchievementsRanks', async (ctx, next) => {
+    try {
+        let artistId = ctx.request.body.artistId;
+        if (!artistId) { ctx.response.body = ResponseService.createErrResponse('artistId not found'); return; }
+        let artist = await ArtistService.findOne({id: artistId});
+        if (!artist) { ctx.response.body = ResponseService.createErrResponse('Artist not found'); return; }
+        let products = ctx.request.body.products;
+        let ret = await ArtistService.updateAchievementsRanks(artist, products);
+        ctx.response.body = ResponseService.createJSONResponse(ret);
+    } catch (e) {
+        ctx.response.body = ResponseService.createErrResponse(e);
+    }
+});
+
+// OK
 router.post('/deleteArticleProduct', async (ctx, next) => {
     try {
-        let name = ctx.request.body.artistName;
-        if (!name) { ctx.response.body = ResponseService.createErrResponse('ArtistName not found'); return; }
-        let artist = await ArtistService.findOne({name: name});
-        if (!artist) { ctx.response.body = ResponseService.createErrResponse('Artist not found'); return; }
-        let artistId = artist.get('id');
+        let artistId = ctx.request.body.artistId;
+        if (!artistId) { ctx.response.body = ResponseService.createErrResponse('ArtistId not found'); return; }
+        // let artist = await ArtistService.findOne({id: artistId});
+        // if (!artist) { ctx.response.body = ResponseService.createErrResponse('Artist not found'); return; }
+        // let artistId = artist.get('id');
         let productId = ctx.request.body.productId;
         if (!productId) { ctx.response.body = ResponseService.createErrResponse('ProductId not found'); return; }
-        let artistProduct = await ArtistService.findArtistProduct({artistId: artistId, productId: productId})
+        let artistProduct = await ArtistService.findArtistProduct({artistId: artistId, productId: productId});
         if (!artistProduct) { ctx.response.body = ResponseService.createErrResponse('ArtistProduct not found'); return; }
         let ret = await ArtistService.deleteArtistProduct(artistProduct);
+        ctx.response.body = ResponseService.createJSONResponse(ret);
+    } catch (e) {
+        ctx.response.body = ResponseService.createErrResponse(e);
+    }
+});
+
+// OK
+router.post('/deleteAchievement', async (ctx, next) => {
+    try {
+        let artistId = ctx.request.body.artistId;
+        if (!artistId) { ctx.response.body = ResponseService.createErrResponse('ArtistId not found'); return; }
+        let productId = ctx.request.body.productId;
+        if (!productId) { ctx.response.body = ResponseService.createErrResponse('ProductId not found'); return; }
+        let achievement = await ArtistService.findAchievement({artistId: artistId, productId: productId})
+        if (!achievement) { ctx.response.body = ResponseService.createErrResponse('Achievement not found'); return; }
+        let ret = await ArtistService.deleteAchievement(achievement);
         ctx.response.body = ResponseService.createJSONResponse(ret);
     } catch (e) {
         ctx.response.body = ResponseService.createErrResponse(e);

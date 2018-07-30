@@ -1,10 +1,15 @@
 const ArtistRepository = require('../orm/repository/artistRepository');
 const ArtistProductRepository = require('../orm/repository/artistProductRepository');
+const AchievementRepository = require('../orm/repository/achievementRepository');
 const ProductRepository = require('../orm/repository/productRepository');
 const ArtistViewModel = require('../view_model/artist');
 const Qiniu = require('../utils/qiniu');
 
 let pub = {};
+
+pub.getTotalSize = async (identity) => {
+    return await ArtistRepository.getTotalSize(identity)
+};
 
 pub.findOne = async (filter) => {
     return await ArtistRepository.findOne(filter);
@@ -18,6 +23,10 @@ pub.findArtistProduct = async (filter) => {
     return await ArtistProductRepository.findOne(filter);
 };
 
+pub.findAchievement = async (filter) => {
+    return await AchievementRepository.findOne(filter);
+};
+
 pub.create = async (key, localFile, name, identity, social, address, extraBiography, biography) => {
     try {
         let artist = null;
@@ -25,7 +34,8 @@ pub.create = async (key, localFile, name, identity, social, address, extraBiogra
             artist = await ArtistRepository.create(name, identity, social, address, extraBiography, biography, img);
         });
         let id = artist.get('id');
-        return {id:id};
+        let img = await artist.getCoverImg();
+        return {id:id, img_url: img.get('url')};
     } catch (e) {
         return e;
     }
@@ -33,10 +43,12 @@ pub.create = async (key, localFile, name, identity, social, address, extraBiogra
 
 pub.updateImg = async (artist, key, localFile) => {
     try {
+        let newImg = null;
         await Qiniu.uploadFile(key, localFile, async function (img) {
             await ArtistRepository.updateImg(artist, img);
+            newImg = img
         });
-        return 'success';
+        return newImg.get('url');
     } catch (e) {
         return e;
     }
@@ -80,11 +92,11 @@ pub.createArtistViewModel = async (artist) => {
     }
 };
 
-pub.createArtistsViewModel = async (artists, pageOffset, itemSize) => {
+pub.createArtistsViewModel = async (artists, pageOffset, itemSize, total) => {
     try {
-        let ret = { pageOffset: pageOffset, itemSize: itemSize, total: artists.length };
+        let ret = { pageOffset: pageOffset, itemSize: itemSize, total: total };
         let list = [];
-        for(let x = pageOffset * itemSize; x < artists.length && x < pageOffset * itemSize + itemSize; x++ ) {
+        for(let x in artists) {
             let artist = artists[x];
             let id = artist.get('id');
             let name = artist.get('name');
@@ -92,7 +104,8 @@ pub.createArtistsViewModel = async (artists, pageOffset, itemSize) => {
             let img = await artist.getCoverImg();
             let img_id = img.get('id');
             let img_url = img.get('url');
-            list.push(ArtistViewModel.createArtistBrief(id, name, identity, img_id, img_url))
+            const biography = JSON.parse(artist.get('biography')) || {};
+            list.push(ArtistViewModel.createArtistBrief(id, name, identity, img_id, img_url, biography.role))
         }
         ret['artists'] = list;
         return ret;
@@ -103,8 +116,17 @@ pub.createArtistsViewModel = async (artists, pageOffset, itemSize) => {
 
 pub.createArtistProduct = async (artist, product, rank) => {
     try {
-        await ArtistProductRepository.create(artist, product, rank);
-        return 'success';
+        let artistProduct = await ArtistProductRepository.create(artist, product, rank);
+        return {id: artistProduct.get('id')};
+    } catch (e) {
+        return e;
+    }
+};
+
+pub.createAchievement = async (artist, product, rank) => {
+    try {
+        let achievement = await AchievementRepository.create(artist, product, rank);
+        return {id: achievement.get('id')};
     } catch (e) {
         return e;
     }
@@ -112,10 +134,10 @@ pub.createArtistProduct = async (artist, product, rank) => {
 
 pub.createArtistProductsViewModel = async (artist, pageOffset, itemSize) => {
     try {
-        let artistProducts = await ArtistProductRepository.getArtistProducts(artist);
-        let ret = { pageOffset: pageOffset, itemSize: itemSize, total: artistProducts.length };
+        let [artistProducts, total] = await ArtistProductRepository.getArtistProducts(artist, pageOffset, itemSize);
+        let ret = { pageOffset: pageOffset, itemSize: itemSize, total: total };
         let list = [];
-        for(let x = pageOffset * itemSize; x < artistProducts.length && x < pageOffset * itemSize + itemSize; x++ ) {
+        for(let x in artistProducts) {
             let artistProduct = artistProducts[x];
             let artistProductId = artistProduct.get('id');
             let rank = artistProduct.get('rank');
@@ -139,9 +161,38 @@ pub.createArtistProductsViewModel = async (artist, pageOffset, itemSize) => {
     }
 };
 
+pub.createAchievementsViewModel = async (artist, pageOffset, itemSize) => {
+    try {
+        let [achievements, total] = await AchievementRepository.getAchievements(artist, pageOffset, itemSize);
+        let ret = { pageOffset: pageOffset, itemSize: itemSize, total: total };
+        let list = [];
+        for(let x in achievements) {
+            let achievement = achievements[x];
+            let achievementId = achievement.get('id');
+            let rank = achievement.get('rank');
+            let productId = achievement.get('productId');
+            let product = await ProductRepository.findOne({id:productId});
+            let title = product.get('title');
+            let session = product.get('session');
+            let releaseTime = product.get('releaseTime');
+            let introduction = product.get('introduction');
+            let img = await product.getCoverImg();
+            let img_id = img.get('id');
+            let img_url = img.get('url');
+            list.push(ArtistViewModel.createAchievements(
+                achievementId, rank, productId, title, session, releaseTime, introduction, img_id, img_url)
+            );
+        }
+        ret['achievements'] = list;
+        return ret;
+    } catch (e) {
+        return e;
+    }
+};
+
 pub.updateRanks = async (artist, products) => {
     try {
-        let artistProducts = await ArtistProductRepository.getArtistProducts(artist);
+        let artistProducts = await artist.getArtistProducts();
         for (let x in products) {
             let productId = products[x].productId;
             let rank = products[x].rank;
@@ -152,6 +203,26 @@ pub.updateRanks = async (artist, products) => {
                 }
             }
         }
+        return "success";
+    } catch (e) {
+        return e;
+    }
+};
+
+pub.updateAchievementsRanks = async (artist, products) => {
+    try {
+        let achievements = await artist.getAchievements();
+        for (let x in products) {
+            let productId = products[x].productId;
+            let rank = products[x].rank;
+            for (let y in achievements) {
+                let achievement = achievements[y];
+                if (achievement.get('productId') == productId) {
+                    await AchievementRepository.update(achievement, rank);
+                }
+            }
+        }
+        return "success";
     } catch (e) {
         return e;
     }
@@ -160,6 +231,15 @@ pub.updateRanks = async (artist, products) => {
 pub.deleteArtistProduct = async (artistProduct) => {
     try {
         await ArtistProductRepository.delete(artistProduct);
+        return 'success';
+    } catch (e) {
+        return e;
+    }
+};
+
+pub.deleteAchievement = async (achievement) => {
+    try {
+        await AchievementRepository.delete(achievement);
         return 'success';
     } catch (e) {
         return e;

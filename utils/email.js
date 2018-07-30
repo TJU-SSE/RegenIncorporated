@@ -3,7 +3,7 @@ var conf = require('./config');
 
 let pub = {};
 
-pub.sendMail = async (email, content, varificationCode) => {
+pub.sendMail = async (email, content, name) => {
     var mailTransport = nodemailer.createTransport({
         host: conf.mail_host,
         auth: {
@@ -19,15 +19,15 @@ pub.sendMail = async (email, content, varificationCode) => {
     send_to = send_to.substr(0, send_to.length - 1);
 
     var options = {
-        from: '"From Regeneration.cn" <' + conf.mail_user + '>',
+        from: '"From Regen.org.cn" <' + conf.mail_user + '>',
         to: send_to,
         // cc     : ''  //抄送
         // bcc     : ''  //密送
-        subject: '[!]来自Regeneration.cn的表单',
-        text: '[!]来自Regeneration.cn的表单',
+        subject: '[!]来自Regen.org.cn的表单',
+        text: '[!]来自Regen.org.cn的表单',
         html: 
-            '<h1>name</h1>' + '<p>' + varificationCode + '</p><br>' + 
-            '<h1>email</h1>' + '<p>' + email + '</p><br>' + 
+            '<h1>name</h1>' + '<p>' + name + '</p><br>' + 
+            '<h1>email</h1>' + '<p>' + email + '</p><br>' +
             '<h1>content</h1>' + '<p>' + content + '</p><br>',
     };
 

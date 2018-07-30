@@ -1,6 +1,7 @@
 const News = require('../model/news');
 const NewsTagRepository = require('./newsTagRepository');
 const TagRepository = require('./tagRepository');
+const IndexImgRepository = require('./indexImgRepository');
 const Qiniu = require('../../utils/qiniu');
 
 let pub = {};
@@ -55,10 +56,13 @@ pub.update = async (news, title, writer, content, time, tags) => {
             let newsTag = oldTags[x];
             await NewsTagRepository.delete(newsTag);
         }
-
-        let tag = await TagRepository.findOrCreate(tags);
-        let newsTag = await NewsTagRepository.create(news, tag);
-        newsTags.push(newsTag);
+        let newsTags = [];
+        for (let x in tags) {
+            let tagTitle = tags[x];
+            let tag = await TagRepository.findOrCreate(tagTitle);
+            let newsTag = await NewsTagRepository.create(news, tag);
+            newsTags.push(newsTag);
+        }
         await news.setNewsTags(newsTags);
     }
     await news.save();
@@ -74,6 +78,7 @@ pub.deleteOne = async (filter) => {
             let newsTag = newsTags[x];
             await newsTag.destroy();
         }
+        await IndexImgRepository.deleteOne({news_id:news.get('id')});
         await news.destroy();
     }
 };

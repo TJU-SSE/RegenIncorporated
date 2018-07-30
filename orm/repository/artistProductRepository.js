@@ -44,8 +44,10 @@ pub.delete = async (artistProduct) => {
     await artistProduct.destroy();
 };
 
-pub.getArtistProducts = async (artist) => {
-    return artist.getArtistProducts();
+pub.getArtistProducts = async (artist, pageOffset, itemSize) => {
+    let artistProducts = await ArtistProduct.findAll({'limit': itemSize, 'offset': pageOffset, 'order': 'rank', where:{artistId: artist.get('id')}});
+    let count = await ArtistProduct.count({where:{artistId: artist.get('id')}});
+    return [artistProducts, count];
 };
 
 module.exports = pub;

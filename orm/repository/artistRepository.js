@@ -1,8 +1,15 @@
 const Artist = require('../model/artist');
 const ArtistProductRepository = require('./artistProductRepository');
+const AchievementRepository = require('./achievementRepository');
 const Qiniu = require('../../utils/qiniu');
 
 let pub = {};
+
+pub.getTotalSize = async (identity) => {
+  return await Artist.count({
+    where: {identity: identity}
+  })
+};
 
 pub.findAll = async () => {
     let res = await Artist.findAll();
@@ -10,7 +17,7 @@ pub.findAll = async () => {
 };
 
 pub.findAllFilter = async (filter) => {
-    let res = await Artist.findAll({where: filter});
+    let res = await Artist.findAll(filter);
     return res;
 };
 
@@ -50,10 +57,15 @@ pub.deleteOne = async (filter) => {
     if (artist) {
         let img = await artist.getCoverImg();
         await Qiniu.deleteFile(img);
-        let articleProducts = await ArtistProductRepository.getArtistProducts(artist);
+        let articleProducts = await artist.getArtistProducts();
         for (let x in articleProducts) {
             let articleProduct = articleProducts[x];
             await ArtistProductRepository.delete(articleProduct);
+        }
+        let achievements = await artist.getAchievements();
+        for (let x in achievements) {
+            let achievement = achievements[x];
+            await AchievementRepository.delete(achievement);
         }
         await artist.destroy();
     }

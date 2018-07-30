@@ -9,7 +9,7 @@ let Message = sequlize.define('message', {
     },
     email: Sequlize.STRING(100),
     content: Sequlize.STRING(5000),
-    varificationCode: Sequlize.STRING(1000),
+    name: Sequlize.STRING(1000),
     beenReaded: Sequlize.BOOLEAN
 }, {
         freezeTableName: true,

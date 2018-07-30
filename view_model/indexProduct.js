@@ -1,9 +1,9 @@
 let pub = {};
 
-pub.createProduct = function (id, title, session, releaseTime, introduction, img_id, img_url, imgs, tags = [], rank = -1, index = null) {
-    console.log(id, title, session, releaseTime, introduction, img_id, img_url, imgs, index);
+pub.createIndexProductsViewModel = function (id, product_id, title, session, releaseTime, introduction, img_id, img_url, imgs, tags, rank = -1) {
     return {
         id: id,
+        product_id: product_id,
         title: title,
         session: session,
         releaseTime: releaseTime,
@@ -12,9 +12,8 @@ pub.createProduct = function (id, title, session, releaseTime, introduction, img
         img_url: img_url,
         imgs: imgs,
         rank: rank,
-        tags: tags,
-        index
-    };
+        tags: tags
+    }
 };
 
 module.exports = pub;
