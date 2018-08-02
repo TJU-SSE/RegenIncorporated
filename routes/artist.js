@@ -80,7 +80,8 @@ router.post('/create', async (ctx, next) => {
         let extraBiography = ctx.request.body.fields.extraBiography || '';
         let biography = ctx.request.body.fields.biography || '';
         let timestamp = Date.parse(new Date());
-        let ret = await ArtistService.create(timestamp, file.path, name, identity, social, address, extraBiography, biography);
+        let display = ctx.request.body.fields.display || '';
+        let ret = await ArtistService.create(timestamp, file.path, name, identity, social, address, extraBiography, biography, display);
         ctx.response.body = ResponseService.createJSONResponse(ret);
     } catch (e) {
         ctx.response.body = ResponseService.createErrResponse(e);
@@ -100,7 +101,11 @@ router.post('/update', async (ctx, next) => {
         let address = ctx.request.body.address || '';
         let extraBiography = ctx.request.body.extraBiography || '';
         let biography = ctx.request.body.biography || '';
-        let ret = await ArtistService.update(artist, name, identity, social, address, extraBiography, biography);
+        let display = ctx.request.body.display || '';
+        if (ctx.request.body.display === false){
+            display = false;
+        }
+        let ret = await ArtistService.update(artist, name, identity, social, address, extraBiography, biography, display);
         ctx.response.body = ResponseService.createJSONResponse(ret);
     } catch(e) {
         ctx.response.body = ResponseService.createErrResponse(e);

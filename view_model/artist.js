@@ -1,7 +1,7 @@
 let pub = {};
 
-pub.createArtist = function (id, name, identity, social, address, extraBiography, biography, viewcount, img_id, img_url) {
-    console.log(id, name, identity, social, address, extraBiography, biography, img_id, img_url);
+pub.createArtist = function (id, name, identity, social, address, extraBiography, biography, viewcount, img_id, img_url, display) {
+    console.log(id, name, identity, social, address, extraBiography, biography, img_id, img_url, display);
     return {
         id: id,
         name: name,
@@ -12,19 +12,21 @@ pub.createArtist = function (id, name, identity, social, address, extraBiography
         biography: biography,
         viewcount: viewcount,
         img_id: img_id,
-        img_url: img_url
+        img_url: img_url,
+        display: display
     };
 };
 
-pub.createArtistBrief = function (id, name, identity, img_id, img_url, role) {
-    console.log(id, name, identity, img_id, img_url);
+pub.createArtistBrief = function (id, name, identity, img_id, img_url, role, display) {
+    console.log(id, name, identity, img_id, img_url, display);
     return {
         id: id,
         name: name,
         identity: identity,
         img_id: img_id,
         img_url: img_url,
-        role
+        role,
+        display: display
     };
 };
 

@@ -13,7 +13,8 @@ let Artist = sequlize.define('artist', {
     address: Sequlize.STRING(1000),
     extraBiography: Sequlize.STRING(5000),
     biography: Sequlize.STRING(5000),
-    viewcount: Sequlize.BIGINT
+    viewcount: Sequlize.BIGINT,
+    display: Sequlize.BOOLEAN
 }, {
     freezeTableName: true,
     timestamps: true,

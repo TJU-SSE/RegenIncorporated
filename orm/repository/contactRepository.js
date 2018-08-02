@@ -3,8 +3,13 @@ const Qiniu = require('../../utils/qiniu');
 
 let pub = {};
 
-pub.get = async () => {
-    let res = await Contact.findOne({id: 1});
+pub.findAll = async () => {
+    let res = await Contact.findAll();
+    return res;
+};
+
+pub.get = async (id) => {
+    let res = await Contact.findOne({ where: { id: id } });
     return res;
 };
 
@@ -27,9 +32,11 @@ pub.updateImg = async (key, localFile) => {
     }
 };
 
-pub.update = async (phone, photography, fax, address, link, social, desc) => {
+pub.update = async (phone, photography, fax, address, link, social, desc, id, city_name) => {
     try {
-        let contact = await pub.get();
+        console.log(id);
+        if(!(id)) id = 1;
+        let contact = await pub.get(id);
         if(phone) contact.phone = phone;
         if(photography) contact.photography = photography;
         if(fax) contact.fax = fax;
@@ -37,6 +44,7 @@ pub.update = async (phone, photography, fax, address, link, social, desc) => {
         if(link) contact.link = link;
         if(social) contact.social = social;
         if(desc) contact.desc = desc;
+        if(city_name) contact.city_name = city_name;
         console.log('before save-----------', contact)
         await contact.save();
       console.log('after save-----------', contact)

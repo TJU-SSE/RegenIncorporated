@@ -30,8 +30,8 @@ pub.findOne = async (filter) => {
     return res;
 };
 
-pub.create = async (name, identity, social, address, extraBiography, biography, img) =>{
-    let artist = await Artist.create({ name: name, identity: identity, social: social, address: address, extraBiography: extraBiography, biography: biography, viewcount: 0 });
+pub.create = async (name, identity, social, address, extraBiography, biography, img, display) =>{
+    let artist = await Artist.create({ name: name, identity: identity, social: social, address: address, extraBiography: extraBiography, biography: biography, viewcount: 0, display});
     artist.setCoverImg(img);
     return artist;
 };
@@ -42,13 +42,17 @@ pub.updateImg = async (artist, img) => {
     artist.setCoverImg(img);
 };
 
-pub.update = async (artist, name, identity, social, address, extraBiography, biography) => {
+pub.update = async (artist, name, identity, social, address, extraBiography, biography, display) => {
     if(name) artist.name = name;
     if(identity) artist.identity = identity;
     if(social) artist.social = social;
     if(address) artist.address = address;
     if(extraBiography) artist.extraBiography = extraBiography;
     if(biography) artist.biography = biography;
+    if(display) artist.display = display;
+    if(display === false){
+        artist.display = false;
+    }
     await artist.save();
 };
 

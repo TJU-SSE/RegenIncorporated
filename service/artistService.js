@@ -27,11 +27,11 @@ pub.findAchievement = async (filter) => {
     return await AchievementRepository.findOne(filter);
 };
 
-pub.create = async (key, localFile, name, identity, social, address, extraBiography, biography) => {
+pub.create = async (key, localFile, name, identity, social, address, extraBiography, biography, display) => {
     try {
         let artist = null;
         await Qiniu.uploadFile(key, localFile, async function (img) {
-            artist = await ArtistRepository.create(name, identity, social, address, extraBiography, biography, img);
+            artist = await ArtistRepository.create(name, identity, social, address, extraBiography, biography, img, display);
         });
         let id = artist.get('id');
         let img = await artist.getCoverImg();
@@ -54,9 +54,9 @@ pub.updateImg = async (artist, key, localFile) => {
     }
 };
 
-pub.update = async (artist, name, identity, social, address, extraBiography, biography) => {
+pub.update = async (artist, name, identity, social, address, extraBiography, biography, display) => {
     try {
-        await ArtistRepository.update(artist, name, identity, social, address, extraBiography, biography);
+        await ArtistRepository.update(artist, name, identity, social, address, extraBiography, biography, display);
         return 'success';
     } catch (e) {
         return e;
@@ -82,10 +82,11 @@ pub.createArtistViewModel = async (artist) => {
         let extraBiography = artist.get('extraBiography');
         let biography = artist.get('biography');
         let viewcount = artist.get('viewcount');
+        let display = artist.get('display');
         let img = await artist.getCoverImg();
         let img_id = img.get('id');
         let img_url = img.get('url');
-        return ArtistViewModel.createArtist(id, name, identity, social, address, extraBiography, biography, viewcount, img_id, img_url);
+        return ArtistViewModel.createArtist(id, name, identity, social, address, extraBiography, biography, viewcount, img_id, img_url, display);
     } catch (e) {
         console.log('123');
         return e;
@@ -101,11 +102,12 @@ pub.createArtistsViewModel = async (artists, pageOffset, itemSize, total) => {
             let id = artist.get('id');
             let name = artist.get('name');
             let identity = artist.get('identity');
+            let display = artist.get('display');
             let img = await artist.getCoverImg();
             let img_id = img.get('id');
             let img_url = img.get('url');
             const biography = JSON.parse(artist.get('biography')) || {};
-            list.push(ArtistViewModel.createArtistBrief(id, name, identity, img_id, img_url, biography.role))
+            list.push(ArtistViewModel.createArtistBrief(id, name, identity, img_id, img_url, biography.role, display))
         }
         ret['artists'] = list;
         return ret;

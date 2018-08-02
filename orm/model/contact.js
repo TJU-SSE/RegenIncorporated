@@ -10,6 +10,7 @@ let Contact = sequlize.define('contact', {
     phone: Sequlize.STRING(100),
     photography: Sequlize.STRING(1000),
     fax: Sequlize.STRING(100),
+    city_name: Sequlize.STRING(1000),
     address: Sequlize.STRING(1000),
     link: Sequlize.STRING(1000),
     social: Sequlize.STRING(5000),

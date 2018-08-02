@@ -7,6 +7,15 @@ const ResponseService = require('../service/responseService');
 router.prefix('/admin/contact');
 
 
+router.get('/getall', async (ctx, next) => {
+    try {
+        let ret = await ContactRepository.findAll();
+        ctx.response.body = ResponseService.createJSONResponse(ret);
+    } catch (e) {
+        ctx.response.body = ResponseService.createErrResponse(e);
+    }
+})
+
 // OK
 router.get('/get', async (ctx, next) => {
     try {
@@ -20,15 +29,19 @@ router.get('/get', async (ctx, next) => {
 // OK
 router.post('/update', async (ctx, next) => {
     try {
-        let phone = ctx.request.body.phone || '';
-        let photography = ctx.request.body.photography || '';
-        let fax = ctx.request.body.fax || '';
-        let address = ctx.request.body.address || '';
-        let link = ctx.request.body.link || '';
-        let social = ctx.request.body.social || '';
-        let desc = ctx.request.body.desc || '';
-        let ret = await ContactRepository.update(phone, photography, fax, address, link, social, desc);
-        ctx.response.body = ResponseService.createJSONResponse(ret);
+        ctx.request.body.msg.forEach(async (item) =>  {
+            let phone = item.phone || '';
+            let photography = item.photography || '';
+            let fax = item.fax || '';
+            let address = item.address || '';
+            let link = item.link || '';
+            let social = item.social || '';
+            let desc = item.desc || '';
+            let id = item.id || '';
+            let city_name = item.city_name || '';
+            let ret = await ContactRepository.update(phone, photography, fax, address, link, social, desc, id, city_name);
+        });
+        ctx.response.body = ResponseService.createJSONResponse("success");
     } catch(e) {
         ctx.response.body = ResponseService.createErrResponse(e);
     }

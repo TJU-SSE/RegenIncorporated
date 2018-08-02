@@ -1,5 +1,5 @@
 var config = {
-  database: 'regen',
+  database: 'RegenIn',
   username: 'test',
   password: 'test',
   host: '212.64.17.49',
@@ -26,7 +26,7 @@ var config = {
 
   // FRONTEND_URLS: ['http://localhost:9092', 'http://121.42.169.109:9092']
   // FRONTEND_URL: 'http://regen.org.cn/'
-  FRONTEND_URLS: ['http://localhost:9092', 'http://212.64.17.49:9092']
+  FRONTEND_URLS: ['http://localhost:9092', 'http://212.64.17.49:9092', 'http://localhost']
 };
 
 module.exports = config;
