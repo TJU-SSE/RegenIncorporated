@@ -8,8 +8,11 @@ let News = sequlize.define('news', {
         autoIncrement: true
     },
     title: Sequlize.STRING(100),
+    title_cn: Sequlize.STRING(100),
     writer: Sequlize.STRING(100),
+    writer_cn: Sequlize.STRING(100),
     content: Sequlize.STRING(10000),
+    content_cn: Sequlize.STRING(10000),
     time: Sequlize.STRING(100),
     viewcount: Sequlize.BIGINT
 
