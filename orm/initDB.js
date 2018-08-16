@@ -16,6 +16,7 @@ const Tag = require('./model/tag');
 const Worker = require('./model/worker');
 const Contact = require('./model/contact');
 const Message = require('./model/message');
+const Video = require('./model/video');
 const Config = require('./model/config');
 
 let syncAll = async () => {
@@ -85,6 +86,10 @@ let syncAll = async () => {
 
     Message.sync().then( function () {
         console.log("create message success");
+    })
+
+    Video.sync().then( function () {
+        console.log("create video success");
     })
 
     Config.sync().then(function () {

@@ -42,13 +42,16 @@ router.post('/create', async (ctx, next) => {
     try {
         let file = ctx.request.body.files.img;
         let title = ctx.request.body.fields.title || '';
+        let title_cn = ctx.request.body.fields.title_cn || '';
         let writer = ctx.request.body.fields.writer || '';
+        let writer_cn = ctx.request.body.fields.writer_cn || '';
         let content = ctx.request.body.fields.content || '';
+        let content_cn = ctx.request.body.fields.content_cn || '';
         let time = ctx.request.body.fields.time || '';
         let tags = ctx.request.body.fields.tags || [];
         if (!Array.isArray(tags)) tags = [tags];
         let timestamp = Date.parse(new Date());
-        let ret = await NewsService.create(timestamp, file.path, title, writer, content, time, tags);
+        let ret = await NewsService.create(timestamp, file.path, title, title_cn, writer, writer_cn, content, content_cn, time, tags);
         ctx.response.body = ResponseService.createJSONResponse(ret);
     } catch (e) {
         ctx.response.body = ResponseService.createErrResponse(e);
@@ -93,12 +96,15 @@ router.post('/update', async (ctx, next) => {
         let news = await NewsService.findOne({id: id});
         if (!news) { ctx.response.body = ResponseService.createErrResponse('News not found'); return; }
         let title = ctx.request.body.title;
+        let title_cn = ctx.request.body.title_cn;
         let writer = ctx.request.body.writer;
+        let writer_cn = ctx.request.body.writer_cn;
         let content = ctx.request.body.content;
+        let content_cn = ctx.request.body.content_cn;
         let time = ctx.request.body.time;
         let tags = ctx.request.body.tags || [];
         if (!Array.isArray(tags)) tags = [tags];
-        let ret = await NewsService.update(news, title, writer, content, time, tags);
+        let ret = await NewsService.update(news, title, title_cn, writer, writer_cn, content, content_cn, time, tags);
         ctx.response.body = ResponseService.createJSONResponse(ret);
     } catch(e) {
         ctx.response.body = ResponseService.createErrResponse(e);

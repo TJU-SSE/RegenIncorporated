@@ -18,11 +18,11 @@ pub.findAll = async (filter) => {
     return await NewsRepository.findAll(filter);
 };
 
-pub.create = async (key, localFile, title, writer, content, time, tags) => {
+pub.create = async (key, localFile, title, title_cn, writer, writer_cn, content, content_cn, time, tags) => {
     try {
         let news = null;
         await Qiniu.uploadFile(key, localFile, async function (img) {
-            news = await NewsRepository.create(title, writer, content, time, img, tags);
+            news = await NewsRepository.create(title, title_cn, writer, writer_cn, content, content_cn, time, img, tags);
         });
         let id = news.get('id');
         return {id:id};
@@ -42,9 +42,9 @@ pub.updateImg = async (news, key, localFile) => {
     }
 };
 
-pub.update = async (news, title, writer, content, time, tags) => {
+pub.update = async (title, title_cn, writer, writer_cn, content, content_cn, time, tags) => {
     try {
-        await NewsRepository.update(news, title, writer, content, time, tags);
+        await NewsRepository.update(title, title_cn, writer, writer_cn, content, content_cn, time, tags);
         return 'success';
     } catch (e) {
         return e;
@@ -64,8 +64,11 @@ pub.createNewsViewModel = async (news) => {
     try {
         let id = news.get('id');
         let title = news.get('title');
+        let title_cn = news.get('title_cn');
         let writer = news.get('writer');
+        let writer_cn = news.get('writer_cn');
         let content = news.get('content');
+        let content_cn = news.get('content_cn');
         let time = news.get('time');
         let viewcount = news.get('viewcount');
         let img = await news.getCoverImg();
@@ -80,7 +83,7 @@ pub.createNewsViewModel = async (news) => {
             let tagTitle = tag.get('title');
             tags.push(tagTitle);
         }
-        return NewsViewModel.createNews(id, title, writer, content, time, viewcount, img_id, img_url, tags);
+        return NewsViewModel.createNews(id, title, title_cn, writer, writer_cn, content, content_cn,  time, viewcount, img_id, img_url, tags);
     } catch (e) {
         return e;
     }
@@ -94,7 +97,9 @@ pub.createNewsesViewModel = async (newses, pageOffset, itemSize, total) => {
             let news = newses[x];
             let id = news.get('id');
             let title = news.get('title');
+            let title_cn = news.get('title_cn');
             let writer = news.get('writer');
+            let writer_cn = news.get('writer_cn');
             let time = news.get('time');
             let img = await news.getCoverImg();
             let img_id = img.get('id');
@@ -108,7 +113,7 @@ pub.createNewsesViewModel = async (newses, pageOffset, itemSize, total) => {
                 let tagTitle = tag.get('title');
                 tags.push(tagTitle);
             }
-            list.push(NewsViewModel.createNewses(id, title, writer, time, img_id, img_url, tags))
+            list.push(NewsViewModel.createNewses(id, title, title_cn, writer, writer_cn, time, img_id, img_url, tags))
         }
         ret['newses'] = list;
         return ret;
@@ -125,7 +130,9 @@ pub.createNewsesViewModelWithoutPage = async (newses) => {
             let news = newses[x];
             let id = news.get('id');
             let title = news.get('title');
+            let title_cn = news.get('title_cn');
             let writer = news.get('writer');
+            let writer_cn = news.get('writer_cn');
             let time = news.get('time');
             let img = await news.getCoverImg();
             let img_id = img.get('id');
@@ -139,7 +146,7 @@ pub.createNewsesViewModelWithoutPage = async (newses) => {
                 let tagTitle = tag.get('title');
                 tags.push(tagTitle);
             }
-            list.push(NewsViewModel.createNewses(id, title, writer, time, img_id, img_url, tags))
+            list.push(NewsViewModel.createNewses(id, title, title_cn, writer, writer_cn, time, img_id, img_url, tags))
         }
         ret['newses'] = list;
         return ret;
@@ -169,7 +176,9 @@ pub.getRecommand = async function (filter) {
                 let news = newses[x];
                 let id = news.get('id');
                 let title = news.get('title');
+                let title_cn = news.get('title_cn');
                 let writer = news.get('writer');
+                let writer_cn = news.get('writer_cn');
                 let time = news.get('time');
                 let img = await news.getCoverImg();
                 let img_id = img.get('id');
@@ -183,7 +192,7 @@ pub.getRecommand = async function (filter) {
                     let tagTitle = tag.get('title');
                     tags.push(tagTitle);
                 }
-                ret.push(NewsViewModel.createNewses(id, title, writer, time, img_id, img_url, tags));
+                ret.push(NewsViewModel.createNewses(id, title, title_cn, writer, writer_cn, time, img_id, img_url, tags));
             }
         }
         return ret;

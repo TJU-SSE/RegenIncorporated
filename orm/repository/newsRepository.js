@@ -25,8 +25,8 @@ pub.findOne = async (filter) => {
     return res;
 };
 
-pub.create = async (title, writer, content, time, img, tags) =>{
-    let news = await News.create({ title: title, writer: writer, content: content, time: time, viewcount: 0});
+pub.create = async (title, title_cn, writer, writer_cn, content, content_cn, time, img, tags) =>{
+    let news = await News.create({ title: title, title_cn: title_cn, writer: writer, writer_cn: writer_cn, content: content, content_cn: content_cn, time: time, viewcount: 0});
     news.setCoverImg(img);
     let newsTags = [];
     for (let x in tags) {
@@ -45,10 +45,13 @@ pub.updateImg = async (news, img) => {
     news.setCoverImg(img);
 };
 
-pub.update = async (news, title, writer, content, time, tags) => {
+pub.update = async (title, title_cn, writer, writer_cn, content, content_cn, time, tags) => {
     if(title) news.title = title;
     if(writer) news.writer = writer;
     if(content) news.content = content;
+    if (title_cn) news.title_cn = title_cn;
+    if (writer_cn) news.writer_cn = writer_cn;
+    if (content_cn) news.content_cn = content_cn;
     if(time) news.time = time;
     if(tags) {
         let oldTags = await news.getNewsTags();
