@@ -118,7 +118,7 @@ router.get('/selectOutsideBanner', async (ctx, next) => {
                 banner: false
             },
             order: [
-                ['banner_rank', 'DESC'],
+                ['banner_rank', 'ASC'],
                 ['releaseTime', 'DESC']
             ]
         });
