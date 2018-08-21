@@ -5,6 +5,7 @@ const AchievementRepository = require('./achievementRepository');
 const ProductTagRepository = require('./productTagRepository');
 const IndexProductRepository = require('./indexProductRepository');
 const Qiniu = require('../../utils/qiniu');
+const Helper = require('../../utils/helper');
 var TagRepository = require("./tagRepository.js");
 
 let pub = {};
@@ -15,7 +16,7 @@ pub.findAll = async () => {
 };
 
 pub.findAllFilter = async (filter) => {
-    filter['order'] = 'releaseTime DESC';
+    filter['order'] = filter['order'] ? filter['order'] : 'releaseTime DESC';
     let res = await Product.findAll(filter);
     return res;
 };
@@ -48,8 +49,8 @@ pub.count = async () => {
     return await Product.count();
 };
 
-pub.create = async (title, session, releaseTime, introduction, img, tags) =>{
-    let product = await Product.create({ title: title, session: session, releaseTime: releaseTime, introduction: introduction});
+pub.create = async (title, session, releaseTime, introduction, img, tags, banner, banner_rank) =>{
+    let product = await Product.create({ title: title, session: session, releaseTime: releaseTime, introduction: introduction, banner, banner_rank});
     product.setCoverImg(img);
     let productTags = [];
     for (let x in tags) {
@@ -80,7 +81,7 @@ pub.deleteProductImg = async (productImg) =>{
     await ProductImgRepository.delete(productImg);
 };
 
-pub.update = async (product, title, session, releaseTime, introduction, tags) => {
+pub.update = async (product, title, session, releaseTime, introduction, tags, banner, banner_rank) => {
     if (title) product.title = title;
     if (session) product.session = session;
     if (releaseTime) product.releaseTime = releaseTime;
@@ -100,6 +101,9 @@ pub.update = async (product, title, session, releaseTime, introduction, tags) =>
         }
         await product.setProductTags(productTags);
     }
+    if(Helper.containsBool(banner)) product.banner = banner;
+    if (banner_rank) product.banner_rank = banner_rank;
+
     await product.save();
 };
 

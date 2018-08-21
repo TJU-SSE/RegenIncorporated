@@ -14,11 +14,11 @@ pub.findOne = async (filter) => {
     return await ProductRepository.findOne(filter);
 };
 
-pub.create = async (key, localFile, title, session, releaseTime, introduction, tags) => {
+pub.create = async (key, localFile, title, session, releaseTime, introduction, tags, banner, banner_rank) => {
     try {
         let product = null;
         await Qiniu.uploadFile(key, localFile, async function (img) {
-            product = await ProductRepository.create(title, session, releaseTime, introduction, img, tags);
+            product = await ProductRepository.create(title, session, releaseTime, introduction, img, tags, banner, banner_rank);
         });
         let id = product.get('id');
         return {id: id};
@@ -48,9 +48,9 @@ pub.updateImg = async (product, key, localFile) => {
     }
 };
 
-pub.update = async (product, title, session, releaseTime, introduction, tags) => {
+pub.update = async (product, title, session, releaseTime, introduction, tags, banner, banner_rank) => {
     try {
-        await ProductRepository.update(product, title, session, releaseTime, introduction, tags);
+        await ProductRepository.update(product, title, session, releaseTime, introduction, tags, banner, banner_rank);
         return 'success';
     } catch (e) {
         return e;
@@ -133,6 +133,8 @@ pub.createProductViewModel = async (product) => {
         let session = product.get('session');
         let releaseTime = product.get('releaseTime');
         let introduction = product.get('introduction');
+        let banner = product.get('banner');
+        let banner_rank = product.get('banner_rank');
         let img = await product.getCoverImg();
         let img_id = img.get('id');
         let img_url = img.get('url');
@@ -166,7 +168,7 @@ pub.createProductViewModel = async (product) => {
             }
         }
 
-        return ProductViewModel.createProduct(id, title, session, releaseTime, introduction, img_id, img_url, imgs, tags, -1, index);
+        return ProductViewModel.createProduct(id, title, session, releaseTime, introduction, img_id, img_url, imgs, tags, -1, index, banner, banner_rank);
     } catch (e) {
         return e;
     }
@@ -179,6 +181,8 @@ pub.selectWithArtists = async (product) => {
         let session = product.get('session');
         let releaseTime = product.get('releaseTime');
         let introduction = product.get('introduction');
+        let banner = product.get('banner');
+        let banner_rank = product.get('banner_rank');
         let img = await product.getCoverImg();
         let img_id = img.get('id');
         let img_url = img.get('url');
@@ -199,7 +203,7 @@ pub.selectWithArtists = async (product) => {
             tags.push(tagTitle);
         }
         let ret = {};
-        ret['product'] = ProductViewModel.createProduct(id, title, session, releaseTime, introduction, img_id, img_url, imgs, tags);
+        ret['product'] = ProductViewModel.createProduct(id, title, session, releaseTime, introduction, img_id, img_url, imgs, tags, -1, null, banner, banner_rank);
         let artistProducts = await product.getArtistProducts();
         let achievements = await product.getAchievements();
         let list = [];
@@ -244,6 +248,8 @@ pub.createProductsViewModel = async (products, pageOffset, itemSize, withoutImgs
             let session = product.get('session');
             let releaseTime = product.get('releaseTime');
             let introduction = product.get('introduction');
+            let banner = product.get('banner');
+            let banner_rank = product.get('banner_rank');
             let img = await product.getCoverImg();
             let img_id = img.get('id');
             let img_url = img.get('url');
@@ -293,7 +299,7 @@ pub.createProductsViewModel = async (products, pageOffset, itemSize, withoutImgs
                 }
             }
 
-            list.push(ProductViewModel.createProduct(id, title, session, releaseTime, introduction, img_id, img_url, imgs, tags, rank, index));
+            list.push(ProductViewModel.createProduct(id, title, session, releaseTime, introduction, img_id, img_url, imgs, tags, rank, index, banner, banner_rank));
         }
         ret['products'] = list;
         return ret;
@@ -315,6 +321,8 @@ pub.createProductsViewModelWithRank = async (products, pageOffset, itemSize, art
       let session = product.get('session');
       let releaseTime = product.get('releaseTime');
       let introduction = product.get('introduction');
+      let banner = product.get('banner');
+      let banner_rank = product.get('banner_rank');
       let img = await product.getCoverImg();
       let img_id = img.get('id');
       let img_url = img.get('url');
@@ -331,7 +339,7 @@ pub.createProductsViewModelWithRank = async (products, pageOffset, itemSize, art
       }
       let imgs = [];
       let tags = [];
-      list.push(ProductViewModel.createProduct(id, title, session, releaseTime, introduction, img_id, img_url, imgs, tags, rank));
+      list.push(ProductViewModel.createProduct(id, title, session, releaseTime, introduction, img_id, img_url, imgs, tags, rank, null, banner, banner_rank));
     }
 
     ret['products'] = list;

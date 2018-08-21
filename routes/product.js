@@ -4,6 +4,7 @@ const ProductService = require('../service/productService');
 const ResponseService = require('../service/responseService');
 const ArtistService = require('../service/artistService');
 const config = require('../utils/config')
+const Helper = require('../utils/helper');
 
 // pre URL
 router.prefix('/admin/product');
@@ -75,6 +76,54 @@ router.get('/selectWithArtists/:id', async (ctx, next) => {
         let product = await ProductService.findOne({id: id});
         if (!product) { ctx.response.body = ResponseService.createErrResponse('Product not found'); return; }
         let ret = await ProductService.selectWithArtists(product);
+        ctx.response.body = ResponseService.createJSONResponse(ret);
+    } catch (e) {
+        ctx.response.body = ResponseService.createErrResponse(e);
+    }
+});
+
+// OK
+router.get('/selectInsideBanner', async (ctx, next) => {
+    try {
+        let pageOffset = ctx.query.pageOffset || 0;
+        let itemSize = ctx.query.itemSize || 20;
+        itemSize = parseInt(itemSize);
+        pageOffset = parseInt(pageOffset) * parseInt(itemSize);
+        let products = await ProductService.findAllFilter({
+            where: {
+                banner: true
+            },
+            order: [
+                ['banner_rank', 'ASC'],
+                ['releaseTime', 'DESC']
+            ]
+        });
+        if (!products) { ctx.response.body = ResponseService.createErrResponse('Products not found'); return; }
+        let ret = await ProductService.createProductsViewModel(products, pageOffset, itemSize);
+        ctx.response.body = ResponseService.createJSONResponse(ret);
+    } catch (e) {
+        ctx.response.body = ResponseService.createErrResponse(e);
+    }
+});
+
+// OK
+router.get('/selectOutsideBanner', async (ctx, next) => {
+    try {
+        let pageOffset = ctx.query.pageOffset || 0;
+        let itemSize = ctx.query.itemSize || 20;
+        itemSize = parseInt(itemSize);
+        pageOffset = parseInt(pageOffset) * parseInt(itemSize);
+        let products = await ProductService.findAllFilter({
+            where: {
+                banner: false
+            },
+            order: [
+                ['banner_rank', 'DESC'],
+                ['releaseTime', 'DESC']
+            ]
+        });
+        if (!products) { ctx.response.body = ResponseService.createErrResponse('Products not found'); return; }
+        let ret = await ProductService.createProductsViewModel(products, pageOffset, itemSize);
         ctx.response.body = ResponseService.createJSONResponse(ret);
     } catch (e) {
         ctx.response.body = ResponseService.createErrResponse(e);
@@ -167,10 +216,12 @@ router.post('/create', async (ctx, next) => {
         let session = ctx.request.body.fields.session || '';
         let releaseTime = ctx.request.body.fields.releaseTime || 0;
         let introduction = ctx.request.body.fields.introduction || '';
+        let banner = Helper.containsBool(ctx.request.body.fields.banner) ? ctx.request.body.fields.banner : false;
+        let banner_rank = ctx.request.body.fields.banner_rank || 0;
         let tags = ctx.request.body.fields.tags || [];
         if (!Array.isArray(tags)) tags = [tags];
         let timestamp = Date.parse(new Date());
-        let ret = await ProductService.create(timestamp, file.path, title, session, releaseTime, introduction, tags);
+        let ret = await ProductService.create(timestamp, file.path, title, session, releaseTime, introduction, tags, banner,banner_rank);
         ctx.response.body = ResponseService.createJSONResponse(ret);
     } catch (e) {
         ctx.response.body = ResponseService.createErrResponse(e);
@@ -204,9 +255,11 @@ router.post('/update', async (ctx, next) => {
         let session = ctx.request.body.session || '';
         let releaseTime = ctx.request.body.releaseTime || 0;
         let introduction = ctx.request.body.introduction || '';
+        let banner = Helper.containsBool(ctx.request.body.banner) ? ctx.request.body.banner : false;
+        let banner_rank = ctx.request.body.banner_rank || 0;
         let tags = ctx.request.body.tags || [];
         if (!Array.isArray(tags)) tags = [tags];
-        let ret = await ProductService.update(product, title, session, releaseTime, introduction, tags);
+        let ret = await ProductService.update(product, title, session, releaseTime, introduction, tags, banner, banner_rank);
         ctx.response.body = ResponseService.createJSONResponse(ret);
     } catch(e) {
         ctx.response.body = ResponseService.createErrResponse(e);

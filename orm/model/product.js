@@ -11,9 +11,17 @@ let Product = sequlize.define('product', {
     session: Sequlize.STRING(100),
     releaseTime: Sequlize.BIGINT,
     introduction: Sequlize.STRING(10000),
+    banner: {
+        type: Sequlize.BOOLEAN,
+        defaultValue: false
+    },
+    banner_rank: {
+        type: Sequlize.BIGINT,
+        defaultValue: 0
+    }
 }, {
     freezeTableName: true,
-    timestamps: true,
+    timestamps: true
 });
 
 module.exports = Product;
