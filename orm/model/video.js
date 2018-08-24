@@ -15,7 +15,14 @@ let Video = sequlize.define('video', {
   intro_cn: Sequlize.STRING(1000),
   cover: Sequlize.STRING(500),
   video: Sequlize.STRING(500),
-  rank: Sequlize.DOUBLE
+  banner: {
+    type: Sequlize.BOOLEAN,
+    defaultValue: false
+  },
+  rank: {
+    type: Sequlize.BIGINT,
+    defaultValue: 0
+  }
   
 }, {
     freezeTableName: true,

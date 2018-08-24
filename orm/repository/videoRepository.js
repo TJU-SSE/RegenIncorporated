@@ -1,6 +1,7 @@
 const Video = require('../model/video');
 const Qiniu = require('../../utils/qiniu');
 var TagRepository = require("./tagRepository.js");
+const Helper = require('../../utils/helper');
 
 let pub = {};
 
@@ -10,7 +11,7 @@ pub.findAll = async () => {
 };
 
 pub.findAllFilter = async (filter) => {
-  filter['order'] = 'updatedAt DESC';
+  filter['order'] = filter['order'] ? filter['order'] : 'updatedAt DESC';
   let res = await Video.findAll(filter);
   return res;
 };
@@ -35,15 +36,15 @@ pub.count = async () => {
   return await Video.count();
 };
 
-pub.create = async (title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank) => {
+pub.create = async (title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank, banner) => {
   let v = await Video.create({ title: title, desc: desc, intro: intro, 
     title_cn: title_cn, desc_cn: desc_cn, intro_cn: intro_cn,
-    cover: cover, video: video, rank: rank});
+    cover: cover, video: video, rank: rank, banner: banner});
 
   return v;
 };
 
-pub.update = async (v, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank) => {
+pub.update = async (v, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank, banner) => {
   if (title) v.title = title;
   if (desc) v.desc = desc;
   if (intro) v.intro = intro;
@@ -53,6 +54,7 @@ pub.update = async (v, title, desc, intro, title_cn, desc_cn, intro_cn, cover, v
   if (cover) v.cover = cover;
   if (video) v.video = video;
   if (rank) v.rank = rank;
+  if (Helper.containsBool(banner)) v.banner = banner;
   await v.save();
 };
 

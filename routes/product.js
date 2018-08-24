@@ -3,7 +3,7 @@ const router = require('koa-router')();
 const ProductService = require('../service/productService');
 const ResponseService = require('../service/responseService');
 const ArtistService = require('../service/artistService');
-const config = require('../utils/config')
+const config = require('../utils/config');
 const Helper = require('../utils/helper');
 
 // pre URL

@@ -2,16 +2,17 @@ const VideoRepository = require('../orm/repository/videoRepository');
 const Qiniu = require('../utils/qiniu');
 const config = require('../utils/config');
 
+
 let pub = {};
 
 pub.findOne = async (filter) => {
   return await VideoRepository.findOne(filter);
 };
 
-pub.create = async (title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank) => {
+pub.create = async (title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank, banner) => {
   try {
     let v = null;
-    v = await VideoRepository.create(title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank);
+    v = await VideoRepository.create(title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank, banner);
     let id = v.get('id');
     return { id: id };
   } catch (e) {
@@ -27,9 +28,9 @@ pub.search = async (key, filter) => {
   return await VideoRepository.search(key, filter);
 };
 
-pub.update = async (v, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank) => {
+pub.update = async (v, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank, banner) => {
   try {
-    await VideoRepository.update(v, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank);
+    await VideoRepository.update(v, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank, banner);
     return 'success';
   } catch (e) {
     return e;
@@ -45,7 +46,7 @@ pub.delete = async (filter) => {
   }
 };
 
-pub.wrap = (id, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank) => {
+pub.wrap = (id, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank, banner) => {
   return {
     id: id,
     title: title,
@@ -57,6 +58,7 @@ pub.wrap = (id, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, r
     cover: cover,
     video: video,
     rank: rank,
+    banner: banner
   };
 }
 
@@ -72,8 +74,9 @@ pub.createVideoViewModel = async (v) => {
     let cover = v.get('cover');
     let video = v.get('video')
     let rank = v.get('rank');
+    let banner = v.get('banner');
 
-    return pub.wrap(id, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank);
+    return pub.wrap(id, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank, banner);
   } catch (e) {
     return e;
   }
@@ -96,8 +99,9 @@ pub.createVideosViewModel = async (videos, pageOffset, itemSize, count = null) =
       let cover = v.get('cover');
       let video = v.get('video')
       let rank = v.get('rank');
+      let banner = v.get('banner');
 
-      list.push(pub.wrap(id, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank));
+      list.push(pub.wrap(id, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank, banner));
     }
     ret['videos'] = list;
     return ret;

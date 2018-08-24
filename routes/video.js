@@ -2,7 +2,8 @@ const router = require('koa-router')();
 
 const VideoService = require('../service/videoService');
 const ResponseService = require('../service/responseService');
-const config = require('../utils/config')
+const config = require('../utils/config');
+const Helper = require('../utils/helper');
 
 // pre URL
 router.prefix('/admin/video');
@@ -47,7 +48,42 @@ router.get('/getAll', async (ctx, next) => {
     let itemSize = ctx.query.itemSize || 20;
     itemSize = parseInt(itemSize);
     pageOffset = parseInt(pageOffset) * parseInt(itemSize);
-    let videos = await VideoService.findAllFilter({ 'limit': itemSize, 'offset': pageOffset });
+    let videos = await VideoService.findAllFilter({ 
+      'limit': itemSize, 
+      'offset': pageOffset,
+      where: {
+        banner: false
+      },
+      order: [
+        ['rank', 'ASC'],
+        ['updatedAt', 'DESC']
+      ]
+    });
+    if (!videos) { ctx.response.body = ResponseService.createErrResponse('Videos not found'); return; }
+    let ret = await VideoService.createVideosViewModel(videos, pageOffset, itemSize);
+    ctx.response.body = ResponseService.createJSONResponse(ret);
+  } catch (e) {
+    ctx.response.body = ResponseService.createErrResponse(e);
+  }
+});
+
+router.get('/getVideoBanner', async (ctx, next) => {
+  try {
+    let pageOffset = ctx.query.pageOffset || 0;
+    let itemSize = ctx.query.itemSize || 20;
+    itemSize = parseInt(itemSize);
+    pageOffset = parseInt(pageOffset) * parseInt(itemSize);
+    let videos = await VideoService.findAllFilter({
+      'limit': itemSize,
+      'offset': pageOffset,
+      where: {
+        banner: true
+      },
+      order: [
+        ['rank', 'ASC'],
+        ['updatedAt', 'DESC']
+      ]
+    });
     if (!videos) { ctx.response.body = ResponseService.createErrResponse('Videos not found'); return; }
     let ret = await VideoService.createVideosViewModel(videos, pageOffset, itemSize);
     ctx.response.body = ResponseService.createJSONResponse(ret);
@@ -69,8 +105,9 @@ router.post('/create', async (ctx, next) => {
     let cover = ctx.request.body.cover || '';
     let video = ctx.request.body.video || '';
     let rank = ctx.request.body.rank || '';
+    let banner = Helper.containsBool(ctx.request.body.banner) ? ctx.request.body.banner : false;
 
-    let ret = await VideoService.create(title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank);
+    let ret = await VideoService.create(title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank, banner);
     ctx.response.body = ResponseService.createJSONResponse(ret);
   } catch (e) {
     ctx.response.body = ResponseService.createErrResponse(e);
@@ -94,7 +131,8 @@ router.post('/update', async (ctx, next) => {
     let cover = ctx.request.body.cover || '';
     let video = ctx.request.body.video || '';
     let rank = ctx.request.body.rank || '';
-    let ret = await VideoService.update(v, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank);
+    let banner = Helper.containsBool(ctx.request.body.banner) ? ctx.request.body.banner : false;
+    let ret = await VideoService.update(v, title, desc, intro, title_cn, desc_cn, intro_cn, cover, video, rank, banner);
     ctx.response.body = ResponseService.createJSONResponse(ret);
   } catch (e) {
     ctx.response.body = ResponseService.createErrResponse(e);
