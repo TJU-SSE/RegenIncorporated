@@ -45,11 +45,10 @@ pub.count = async () => {
   return await Photography.count();
 };
 
-pub.create = async (title, introduction, title_cn, introduction_cn, cover_url, banner, banner_rank) => {
+pub.create = async (title, introduction, title_cn, introduction_cn, cover_url, banner, banner_rank, tags) => {
   let photography = await Photography.create({
     title: title, introduction: introduction, title_cn: title_cn, cover_url: cover_url, 
     introduction_cn: introduction_cn, banner: banner, banner_rank: banner_rank});
-  Photography.setCoverImg(img);
   let photographyTags = [];
   for (let x in tags) {
     let tagTitle = tags[x];
@@ -61,10 +60,10 @@ pub.create = async (title, introduction, title_cn, introduction_cn, cover_url, b
   return photography;
 };
 
-pub.updateImg = async (photography, img) => {
-  let oldImg = await photography.getCoverImg();
-  photography.setCoverImg(img);
-};
+// pub.updateImg = async (photography, img) => {
+//   photography.cover_url = img.get('url');
+//   await photography.save();
+// };
 
 pub.addPhotographyImg = async (photography, img) => {
   let imgs = await photography.getPhotographyImgs();

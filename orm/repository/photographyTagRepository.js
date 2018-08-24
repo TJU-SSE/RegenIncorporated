@@ -20,7 +20,7 @@ pub.findOne = async (filter) => {
 pub.create = async (photography, tag) =>{
     let photographyId = photography.get('id');
     let tagId = tag.get('id');
-    let photographyTag = await PhotographyTag.create({productId: productId, tagId: tagId});
+    let photographyTag = await PhotographyTag.create({ photographyId: photographyId, tagId: tagId});
     return photographyTag;
 };
 

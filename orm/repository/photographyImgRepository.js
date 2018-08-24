@@ -20,6 +20,7 @@ pub.create = async (img) => {
 
 pub.updateImg = async (photographyImg, img) => {
   let oldImg = await photographyImg.getCoverImg();
+  await oldImg.destroy();
   photographyImg.setCoverImg(img);
 };
 
@@ -27,12 +28,14 @@ pub.deleteOne = async (filter) => {
   let photographyImg = await pub.findOne(filter);
   if (photographyImg) {
     let img = await photographyImg.getCoverImg();
+    await img.destroy();
     await photographyImg.destroy();
   }
 };
 
 pub.delete = async (photographyImg) => {
   let img = await photographyImg.getCoverImg();
+  await img.destroy();
   await photographyImg.destroy();
 };
 
