@@ -17,6 +17,9 @@ const Worker = require('./model/worker');
 const Contact = require('./model/contact');
 const Message = require('./model/message');
 const Video = require('./model/video');
+const Photography = require('./model/photography');
+const PhotographyImg = require('./model/photographyImg');
+const PhotographyTag = require('./model/photographyTag');
 const Config = require('./model/config');
 
 let syncAll = async () => {
@@ -92,6 +95,18 @@ let syncAll = async () => {
         console.log("create video success");
     })
 
+    Photography.sync().then( function () {
+        console.log("create photography success");
+    })
+
+    PhotographyImg.sync().then(function () {
+        console.log("create photographyImg success");
+    })
+
+    PhotographyTag.sync().then(function () {
+        console.log("create photographyTag success");
+    })
+
     Config.sync().then(function () {
         console.log("create config success");
     });
@@ -109,23 +124,46 @@ let init = async () => {
 
     // Img.hasOne(News, { foreignKey: 'cover_img' });
     // Img.hasOne(News, { foreignKey: 'cover_img'});
-    News.belongsTo(Img, { foreignKey: 'cover_img', as: 'coverImg'});
+
+    //---------------- news -------------------------------------------
+    News.belongsTo(Img, { foreignKey: 'cover_img', as: 'coverImg' });
+    News.hasMany(NewsTag, { as: 'NewsTags' });
+    News.hasMany(NewsTag, { as: 'NewsTags' });
+    // 此条为当需要在首页显示时需要的内容，经查证前端已不再使用这种首页
+    IndexImg.belongsTo(News, { foreignKey: 'news_id', as: 'news' }); 
+
+    //---------------- product -------------------------------------------
     ProductImg.belongsTo(Img, { foreignKey: 'cover_img', as: 'coverImg'});
     Product.belongsTo(Img, { foreignKey: 'cover_img', as: 'coverImg'});
     Product.hasMany(ProductImg, {as: 'ProductImgs'});
     Product.hasMany(ArtistProduct, {as: 'ArtistProducts'});
+    Product.hasMany(Achievement, { as: 'Achievements' });
+    Product.hasMany(ProductTag, { as: 'ProductTags' });
+    // 此为首页显示product时的rank
+    IndexProduct.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
+
+    //---------------- artist -------------------------------------------
     Artist.hasMany(ArtistProduct, {as: 'ArtistProducts'});
-    Product.hasMany(Achievement, {as: 'Achievements'});
     Artist.hasMany(Achievement, {as: 'Achievements'});
     Artist.belongsTo(Img, { foreignKey: 'cover_img', as: 'coverImg'});
-    IndexImg.belongsTo(News, { foreignKey: 'news_id', as: 'news'});
-    IndexProduct.belongsTo(Product, { foreignKey: 'product_id', as: 'product'});
-    News.hasMany(NewsTag, {as: 'NewsTags'});
+
+    //---------------- tags -------------------------------------------
     Tag.hasMany(NewsTag, {as: 'NewsTags'});
-    Product.hasMany(ProductTag, {as: 'ProductTags'});
     Tag.hasMany(ProductTag, {as: 'ProductTags'});
+    Tag.hasMany(PhotographyTag, { as: 'PhotographyTags'});
+
+    //---------------- contact -------------------------------------------
+    Contact.belongsTo(Img, { foreignKey: 'cover_img', as: 'coverImg' });
+
+    //---------------- photography -------------------------------------------
+    PhotographyImg.belongsTo(Img, { foreignKey: 'cover_img', as: 'coverImg' });
+    Photography.hasMany(PhotographyImg, { as: 'PhotographyImgs' });
+    Photography.hasMany(PhotographyTag, { as: 'PhotographyTags'});
+
+    //---------------- others -------------------------------------------
     Worker.belongsTo(Img, { foreignKey: 'cover_img', as: 'coverImg'});
-    Contact.belongsTo(Img, { foreignKey: 'cover_img', as: 'coverImg'});
+
+
     await syncAll();
 };
 
