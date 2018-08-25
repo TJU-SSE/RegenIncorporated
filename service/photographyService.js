@@ -157,7 +157,7 @@ pub.createPhotographiesViewModel = async (photographies, pageOffset, itemSize, w
     for (let x in photographies) {
       let photography = photographies[x];
       let id = photography.get('id');
-      let title = photography.get('photography');
+      let title = photography.get('title');
       let introduction = photography.get('introduction');
       let title_cn = photography.get('title_cn');
       let introduction_cn = photography.get('introduction_cn');
