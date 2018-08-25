@@ -52,7 +52,10 @@ router.get('/getAll', async (ctx, next) => {
       'limit': itemSize, 
       'offset': pageOffset,
       where: {
-        banner: false
+        banner: false,
+        '$not': [
+          { 'id': [config.homepage_video_id] }
+        ]
       },
       order: [
         ['rank', 'ASC'],

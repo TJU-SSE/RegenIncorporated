@@ -17,6 +17,7 @@ var config = {
   mail_password: 'regeneration_ms',
 
   mail_to: ['1061152718@qq.com', 'kenneth0875@gmail.com'],
+  homepage_video_id : 21,
 
 
   ARTIST_PRODUCT_TYPES: {
