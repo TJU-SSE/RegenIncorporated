@@ -135,7 +135,7 @@ pub.createIndexProductsViewModel = async (indexProducts, pageOffset, itemSize, t
             for(let x in productImgs) {
                 let productImg = productImgs[x];
                 let img1 = await productImg.getCoverImg();
-                if (!img1) continue;
+                if(!img1) continue;
                 imgs.push({ img_id: img1.get('id'), img_url: img1.get('url') })
             }
             let productTags = await product.getProductTags();
