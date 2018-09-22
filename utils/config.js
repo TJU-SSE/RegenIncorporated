@@ -18,7 +18,7 @@ var config = {
   mail_password: 'regeneration_ms',
 
   mail_to: ['1061152718@qq.com', 'info@regen.org.cn'],
-  homepage_video_id : 21,
+  homepage_video_id : 1,
 
 
   ARTIST_PRODUCT_TYPES: {
