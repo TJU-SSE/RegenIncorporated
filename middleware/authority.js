@@ -12,22 +12,19 @@ function checkIfAllow(request) {
 var checkAuthority = function () {
 
     return async (ctx, next) => {
-
-        await next();
-
-        // if(checkIfAllow(ctx.request)) {
-        //     await next();
-        // }
-        // else {
-        //     var id = ctx.cookies.get('sessionId');
-        //     let session = await SessionRepository.findOne({id: id});
-        //     if(session == null) {
-        //         ctx.response.body = ResponseService.createAuthResponse();
-        //     }
-        //     else {
-        //         await next();
-        //     }
-        // }
+        if(checkIfAllow(ctx.request)) {
+            await next();
+        }
+        else {
+            var id = ctx.cookies.get('sessionId');
+            let session = await SessionRepository.findOne({id: id});
+            if(session == null) {
+                ctx.response.body = ResponseService.createAuthResponse();
+            }
+            else {
+                await next();
+            }
+        }
     };
 };
 
