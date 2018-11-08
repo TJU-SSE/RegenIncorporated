@@ -11,7 +11,7 @@ var config = {
   filePath: '../img/',
   // download: 'http://oq7eluo6z.bkt.clouddn.com/'
   // download: 'http://pc0bksa0g.bkt.clouddn.com/',
-  download: 'http://ovwnlb7r9.bkt.clouddn.com/',
+  download: 'http://cdn.regeneration.cn/',
 
   mail_host: 'smtp.sina.com',
   mail_user: 'regeneration_ms@sina.com',
@@ -28,7 +28,7 @@ var config = {
 
   // FRONTEND_URLS: ['http://localhost:9092', 'http://121.42.169.109:9092']
   // FRONTEND_URL: 'http://regen.org.cn/'
-  FRONTEND_URLS: ['http://localhost:9092', 'http://212.64.17.49:9092', 'http://localhost']
+  FRONTEND_URLS: ['http://localhost:9092', 'http://212.64.17.49:9092', 'http://localhost', 'http://192.168.31.196']
 };
 
 module.exports = config;
